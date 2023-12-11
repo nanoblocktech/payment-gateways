@@ -9,18 +9,19 @@
  * @license See LICENSE file
 */
 namespace Luminova\ExtraUtils\Payment\Merchants;
+
 use Luminova\ExtraUtils\Payment\MerchantInterface;
 
 class PayStack implements MerchantInterface {
    /**
     *
-    * @var string base api url 
+    * @var string $apiBase base api url 
    */
    private string $apiBase = "https://api.paystack.co";
 
    /**
     *
-    * @var string account api private key
+    * @var string $merchantAuthKey account api private key
    */
 	private string $merchantAuthKey = '';
 
