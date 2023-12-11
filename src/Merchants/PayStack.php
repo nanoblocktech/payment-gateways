@@ -11,7 +11,7 @@
 namespace Luminova\ExtraUtils\Payment\Merchants;
 use Luminova\ExtraUtils\Payment\MerchantInterface;
 
-class Paystack implements MerchantInterface {
+class PayStack implements MerchantInterface {
    /**
     *
     * @var string base api url 
