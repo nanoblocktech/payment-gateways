@@ -11,6 +11,7 @@ namespace Luminova\ExtraUtils\Payment;
 
 use Luminova\ExtraUtils\Payment\MerchantInterface;
 use Luminova\ExtraUtils\Payment\Process;
+use Luminova\ExtraUtils\Payment\PaymentException;
 
 class Payment {
     /**
@@ -38,6 +39,7 @@ class Payment {
     public function createInstance(): Process 
     {
         $process = new Process($this->paymentMerchant->getAuthenticationKey(), $this->paymentMerchant->getBaseApi());
+        $process->setProcessor(self::getMerchantClient($this->paymentMerchant));
         return $process;
     }
 
@@ -50,10 +52,21 @@ class Payment {
     */
     public static function getInstance(MerchantInterface $merchant): Process 
     {
-        if(static::$instance === null){
-            static::$instance = new Process($merchant->getAuthenticationKey(), $merchant->getBaseApi());
+        if ($merchant instanceof MerchantInterface) {
+            if(static::$instance === null){
+                static::$instance = new Process($merchant->getAuthenticationKey(), $merchant->getBaseApi());
+                static::$instance->setProcessor(self::getMerchantClient($merchant));
+            }
+            return static::$instance;
         }
-        
-        return static::$instance;
+
+        throw new PaymentException('Invalid argument: $merchant must implement MerchantInterface.');
+    }
+
+    private static function getMerchantClient(object $class)
+    {
+        $namespace = get_class($class);
+        $path = explode('\\', $namespace);
+        return end($path);
     }
 }
