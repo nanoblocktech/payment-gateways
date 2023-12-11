@@ -1,0 +1,40 @@
+{
+    "name": "nanoblocktech/payment-gateways",
+    "type": "library",
+    "description": "PHP class for payment gateways, using same code to process different payment merchants.",
+    "license": "MIT",
+    "keywords": ["PHP", "luminova", "payment gateway", "paystack", "stripe", "braintree", "php payment gateway"],
+    "authors": [
+        {
+            "name": "Ujah Chigozie",
+            "email": "ujahchigozie@gmail.com"
+        },
+       {
+            "name": "Nanoblock Technology",
+            "email": "code@nanoblocktech.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/laravel/payment-gateways/issues",
+        "source": "https://github.com/nanoblocktech/payment-gateways"
+    },
+    
+    "require": {
+       "php": "^8.0"
+    },
+     "extra": {
+        "branch-alias": {
+            "dev-master": "0.1-dev"
+        }
+    },
+    "autoload": {
+        "psr-4": { 
+            "Luminova\\ExtraUtils\\Payment\\": "src/" 
+        }
+  },
+  "config": {
+        "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
