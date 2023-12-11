@@ -9,6 +9,8 @@
  * @license See LICENSE file
 */
 namespace Luminova\ExtraUtils\Payment;
+
+use Luminova\ExtraUtils\Payment\Merchants\Clients;
 use Luminova\ExtraUtils\Payment\PaymentException;
 
 class Network {
@@ -17,6 +19,8 @@ class Network {
    */
    private $authorizationBearer = '';
 
+   private string $merchantName = '';
+
    /**
     * @param string $auth auth bearer token
    */
@@ -24,17 +28,22 @@ class Network {
       $this->authorizationBearer = $auth; 
    }
 
+   public function setMerchantName(string $name): void 
+   {
+      $this->merchantName = $name;
+   }
+
    /**
     * Send network request 
     * @param string $url api endpoint
     * @param string $method api request method 
-    * @param array $param api request parameters
+    * @param array $params api request parameters
     * @param bool $extra 
     *
     * @return array response from server
     * @throws PaymentException
    */
-   public function request(string $url, string $method = 'GET', ?array $param = null, bool $extras = false): array 
+   public function request(string $url, string $method = 'GET', ?array $params = null, bool $extras = false): array 
    {
       $method = strtoupper($method);
       $postField = '';
@@ -43,6 +52,11 @@ class Network {
       }
 
       $curl = curl_init();
+      $postField = $this->buildParams($params);
+      $sendHeaders = [
+         'Authorization: Bearer ' . $this->authorizationBearer,
+         "Cache-Control: no-cache",
+      ];
       curl_setopt($curl, CURLOPT_URL, $url);
       curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($curl, CURLOPT_HEADER, true);
@@ -56,38 +70,84 @@ class Network {
     
       if($method === 'GET'){
          curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-         if($param !== null && $param !== []){
-            $postField = http_build_query($param);
-         }
       }else{
          curl_setopt($curl,CURLOPT_POST, true);
-         if($param !== null && $param !== []){
-            $postField = json_encode($param);
-            $headers['Content-Type'] = 'application/json';
-         }
+         $sendHeaders['Content-Type'] = 'application/json';
       }
 
+      //var_export($postField);exit($url);
+     
       if($postField !== ''){
          curl_setopt($curl, CURLOPT_POSTFIELDS, $postField);
       }
 
-      curl_setopt($curl, CURLOPT_HTTPHEADER, [
-         'Authorization: Bearer ' . $this->authorizationBearer,
-         "Cache-Control: no-cache",
-      ]);
+      curl_setopt($curl, CURLOPT_HTTPHEADER, $sendHeaders);
 
       $response = curl_exec($curl);
       $error = [];
+      $headers = [];
+      $contents = [];
+      $statusCode = 404;
       
       if ($response === false) {
-         $response = [];
-         $error = curl_error($curl);
+         $error = [
+            'message' => curl_error($curl),
+            'code' => curl_errno($curl),
+         ];
+      }else{
+         $info = curl_getinfo($curl);
+         $statusCode = $info['http_code'] ?? 0;
+         $headerSize = $info['header_size'] ?? 0;
+         $returnHeaders = substr($response, 0, strpos($response, "\r\n\r\n"));
+         $contents = substr($response, $headerSize);
+         $headers = $this->headerToArray($returnHeaders, $statusCode);
       }
 
       curl_close($curl);
       return [
-         "error" => $error, 
-         "success" => $response
+         'statusCode' => $statusCode,
+         'headers' => $headers,
+         'error' => $error, 
+         'body' => $contents
       ];
    }
+
+   private function buildParams(?array $params = null): mixed 
+   {
+      if($params === null || $params === []){
+         return '';
+      }
+
+      if($this->merchantName === Clients::PAY_STACK){
+         return  http_build_query($params);
+      }
+
+      if(is_array($params)){
+         return json_encode($params);
+      }
+
+      return $params;
+   }
+
+   /**
+      * Convert a raw header string to an associative array.
+      *
+      * @param string $header
+      * @param int $code
+      *
+      * @return array
+    */
+    private function headerToArray(string $header, int $code): array
+    {
+        $headers = ['statusCode' => $code];
+        foreach (explode("\r\n", $header) as $i => $line) {
+            if ($i === 0) {
+                $headers['http_code'] = $line;
+            } else {
+                [$key, $value] = explode(': ', $line);
+                $headers[$key] = $value;
+            }
+        }
+        return $headers;
+    }
 }
