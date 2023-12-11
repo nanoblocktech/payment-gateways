@@ -25,6 +25,8 @@ class Process  {
     */
     private Network $network;
 
+    private array $headers = [];
+
 
     /**
     * Initializes process instance 
@@ -47,21 +49,59 @@ class Process  {
         return $this;
     }
 
+     /**
+    * Set payment merchant name
+    * @param string $name 
+    * 
+    * @return self $this
+    */
+    public function setProcessor(string $name): self {
+        $this->network->setMerchantName($name);
+        return $this;
+    }
+
+
+    /**
+    * Get response headers
+    * 
+    * @return array $this->headers
+    */
+    public function getHeaders(): array 
+    {
+        return $this->headers;
+    }
+
    /**
     * Find customer account 
     *
-    *@param string $customer Customer email or id code
+    *@param string $customer Customer email or code
     *
     * @return object 
     * @throws PaymentException
    */
    public function findCustomer(string $customer): object 
    {
-        $url = "{$this->apiBase}/customer/" . $customer;
+        $url = "{$this->apiBase}/customer/{$customer}";
         $request = $this->network->request($url, "GET", null, true);
 
         return $this->returnResult($request);
    }
+
+    /**
+    * List customers 
+    *
+    * @param int $limit limit number of customers
+    *
+    * @return object 
+    * @throws PaymentException
+    */
+    public function listCustomers(int $limit = 10): object 
+    {
+        $url = "{$this->apiBase}/customer";
+        $request = $this->network->request($url, "GET", null, true);
+
+        return $this->returnResult($request);
+    }
 
    /**
     * Create customer account 
@@ -78,6 +118,72 @@ class Process  {
 
         return $this->returnResult($request);
    }
+
+   /**
+    * Update customer account 
+    *
+    * @param array $code Customer code
+    * @param array $fields Customer fields
+    *
+    * @return object 
+    * @throws PaymentException
+    */
+    public function updateCustomer(string $code, array $fields): object 
+    {
+        $url = "{$this->apiBase}/customer/{$code}";
+        $request = $this->network->request($url, 'POST', $fields, false);
+
+        return $this->returnResult($request);
+    }
+
+    /**
+    * Validate customer account 
+    *
+    * @param array $code Customer code
+    * @param array $fields Customer fields assistive array 
+    *
+    * @return object 
+    * @throws PaymentException
+    */
+    public function verifyCustomer(string $code, array $fields): object 
+    {
+
+        $url = "{$this->apiBase}/customer/{$code}/identification";
+        $request = $this->network->request($url, 'POST', $fields, false);
+
+        return $this->returnResult($request);
+    }
+
+    /**
+    * Flag customer account 
+    *
+    * @param array $code Customer code
+    * @param string $risk Customer risk action code
+    *
+    * @return object 
+    * @throws PaymentException
+    */
+    public function flagCustomer(string $code, string $risk): object 
+    {
+        $risk = strtolower($risk);
+        $riskActions = [
+            'default', 'allow', 'deny'
+        ];
+        if(in_array($risk, $riskActions)){
+            $fields = [
+                'customer' => $code,
+                'risk_action' => $risk
+            ];
+            $url = "{$this->apiBase}/customer/set_risk_action";
+            $request = $this->network->request($url, 'POST', $fields, false);
+
+            return $this->returnResult($request);
+        }
+
+        throw new PaymentException('Invalid risk action. Supported risk actions: default, allow, deny.');
+    }
+
+
 
    /**
     * Verify payment reference 
@@ -258,19 +364,37 @@ class Process  {
    */
   private function returnResult(array $result): object 
     {
-        if (!empty($result['error'])) {
+        if ($result['error'] !== []) {
             throw new PaymentException($result['error']);
         }
 
-        if (empty($result['success'])) {
+        $body = $result['body'] ?? '';
+        $contents = $body;
+
+        if ($body === '') {
             throw new PaymentException("Something went wrong");
         }
 
-        if (!$result['success']['status']) {
-            throw new PaymentException(($result['success']['message'] ?? "Transfer was not successful"));
+        //if (is_string($body) &&  strpos($result['headers']['Content-Type'], 'application/json') !== false) {
+        $this->headers = $result['headers'];
+        if (is_string($body) &&  strpos($body, '{') !== false) {
+            $contents = json_decode($body);
+            if ($contents === null) {
+                if(json_last_error() === JSON_ERROR_NONE){
+                    $contents = [
+                        'status' => false,
+                        'message' =>  json_last_error_msg(),
+                        'response' => $body
+                    ];
+                }
+            }
         }
 
-        return (object) $result['success'];
+        /*if (!$contents->status) {
+            throw new PaymentException(($contents->message ?? "Transfer was not successful"));
+        }*/
+
+        return  (object) $contents;
     }
 
 }
