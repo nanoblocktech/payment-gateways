@@ -13,5 +13,5 @@ parameters:
 	checkGenericClassInNonGenericObjectType: false
 	checkMissingCallableSignature: true
 	treatPhpDocTypesAsCertain: false
-  checkOctaneCompatibility: true
-  checkModelProperties: truee
+  	checkOctaneCompatibility: true
+  	checkModelProperties: truee
