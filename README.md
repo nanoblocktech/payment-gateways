@@ -31,3 +31,6 @@ To get started see the library documentation
 7. [Webhook & Routing Handling](docs/HOOKS.md)
 8. [API Request Response](docs/RESPONSE.md)
 
+## License
+
+The MIT License (MIT). Please see [License](LICENSE) for more information.
