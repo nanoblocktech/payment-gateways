@@ -22,7 +22,7 @@ composer require nanoblocktech/payment-gateways
 
 To get started see the library documentation
 
-1. [Framework documentation](docs/)
+1. [Getting Started](docs/)
 2. [Customer Management](docs/CUSTOMER.md)
 3. [Customers Account Management](docs/ACCOUNT.md)
 4. [Payments & Transactions](docs/PAYMENT.md)
