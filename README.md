@@ -27,7 +27,7 @@ To get started see the library documentation
 3. [Customers Account Management](docs/ACCOUNT.md)
 4. [Payments & Transactions](docs/PAYMENT.md)
 5. [Payment Charges Calculations](docs/CHARGES.md)
-6. [Banks $ Dedicated Virtual Account](docs/BANK.md)
+6. [Banks & Dedicated Virtual Account](docs/BANK.md)
 7. [Webhook & Routing Handling](docs/HOOKS.md)
 8. [API Request Response](docs/RESPONSE.md)
 
