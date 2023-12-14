@@ -22,12 +22,12 @@ composer require nanoblocktech/payment-gateways
 
 To get started see the library documentation
 
-[Framework documentation](docs/)
-[Customer Management](docs/CUSTOMER.md)
-[Customers Account Management](docs/ACCOUNT.md)
-[Payments & Transactions](docs/PAYMENT.md)
-[Payment Charges Calculations](docs/CHARGES.md)
-[Banks $ Dedicated Virtual Account](docs/BANK.md)
-[Webhook & Routing Handling](docs/HOOKS.md)
-[API Request Response](docs/RESPONSE.md)
+1. [Framework documentation](docs/)
+2. [Customer Management](docs/CUSTOMER.md)
+3. [Customers Account Management](docs/ACCOUNT.md)
+4. [Payments & Transactions](docs/PAYMENT.md)
+5. [Payment Charges Calculations](docs/CHARGES.md)
+6. [Banks $ Dedicated Virtual Account](docs/BANK.md)
+7. [Webhook & Routing Handling](docs/HOOKS.md)
+8. [API Request Response](docs/RESPONSE.md)
 
