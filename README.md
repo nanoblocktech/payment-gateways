@@ -1,4 +1,9 @@
-Simple php payment gateway to process multiple payment merchant gateways 
+Easy to use PHP payment gateway library designed for PHP 8 and above.
+The primary goal of this library is to facilitate seamless transitions between different payment merchants,
+allowing developers to switch gateways without the need for relearning of new implementation and documentation.
+Initialization involves specifying the preferred merchant, ensuring a smooth and consistent experience.
+Currently, PayStack is the starting point for this library.
+
 
 Installation Guide via Composer:
 
@@ -8,19 +13,19 @@ composer require nanoblocktech/payment-gateways
 
 ## Available Merchant Payment
 
-1. PayStack - https://paystack.com/docs/api/
+1. PayStack - Here you can find about PayStack API documentation to get started https://paystack.com/docs/api/
 
 #### Initialize payment gateway
 To initialize the payment gateway you will need to pass the merchant interface you want to use 
 
-First initialize your payment merchant gateway 
+First, initialize your payment merchant gateway 
 
 ```php 
 $gateway = new PayStack("PAYMENT_PRIVATE_KEY");
 ```
 
-Calling `Merchant::getInstance` will return instance of `Bank`, `Customers` and `Processor as Payment`
-which can then be use to access individual class instance `$merchant->bank->foo()`
+Calling `Merchant::getInstance` will return instances of `Bank`, `Customers`, and `Processor as Payment`
+which can then be used to access individual class instances `$merchant->bank->foo()`
 
 ```php
 $merchant = Merchant::getInstance($gateway);
@@ -37,7 +42,7 @@ Initialize with customer instance
 $customer = Merchant::getCustomerInstance($gateway);
 ```
 
-Initialize with bank instance 
+Initialize with a bank instance 
 ```php
 $bank = Merchant::getBankInstance($gateway);
 ```
@@ -45,7 +50,7 @@ $bank = Merchant::getBankInstance($gateway);
 
 ### CUSTOMERS
 
-If you are using `getInstance` then you must access customer instance by using `$merchant->customer->` else if you are working with `getCustomerInstance` you can directly call customer class method.
+If you are using `getInstance` then you must access the customer instance by using `$merchant->customer->` else if you are working with `getCustomerInstance` you can directly call the customer class method.
 
 Create customer account 
 
@@ -78,7 +83,7 @@ if($result->isSuccess()){
 ```
 
 
-Flag customer account based on risk level
+Flag customer accounts based on risk level
 Allowed flags `PayStack::FLAG_DEFAULT`, `PayStack::FLAG_ALLOW`, or `PayStack::FLAG_DENY`
 
 ```php
@@ -111,17 +116,18 @@ $result = $customer->find('CUS_jbf8bq0kbkrk3sc');
 
 ### CUSTOMER ACCOUNT 
 
-Initialize customer account with email address or customer code
+Initialize customer account with an email address or customer code
 
 ```php
 $account = $customer->withAccount('CUS_jbf8bq0kbkrk3sc');
 ```
 
-Create a new customer account and assign it to current session
+Create a new customer account and assign it to the current session
+
 ```php
 $result = $account->create(['array']);
 ```
-Update current session customer account 
+Update the current session customer account 
 
 ```php
 $result = $account->update(['array']);
@@ -137,7 +143,7 @@ Flag current session customer account
 $result = $account->flag(PayStack::FLAG_DENY);
 ```
 
-Refresh current session customer account 
+Refresh the current session customer account 
 ```php
 $result = $account->refresh();
 ```
