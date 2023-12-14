@@ -144,9 +144,9 @@ $result = $account->refresh();
 
 Get property by key name using get method or directly access the object property by name 
 ```php
-$result = $account->get('email');
+$email = $account->get('email');
 // OR
-$result = $account->email;
+$email = $account->email;
 ```
 
 ### PAYMENTS 
