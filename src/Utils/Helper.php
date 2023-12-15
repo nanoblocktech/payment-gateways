@@ -12,6 +12,10 @@ namespace Luminova\ExtraUtils\Payment\Utils;
 use Luminova\ExtraUtils\Payment\Exceptions\PaymentException;
 class Helper {
 
+    /**
+     * Paystack risk actions 
+     * @var array RISK_ACTIONS
+    */
     public const RISK_ACTIONS = [
         'default', 'allow', 'deny'
     ];
@@ -74,15 +78,31 @@ class Helper {
         return end($path);
     }
 
+    /**
+     * Check if requested array has all required keys 
+     * 
+     * @param array $keys original array keys
+     * @param array $keys original requested array
+     * 
+     * @return boolean
+    */
     public static function isPassedRequired(array $keys, array $fields): bool 
     {
         return !array_diff_key(array_flip($keys), $fields);
     }
 
+    /**
+     * Retrieve missing required keys 
+     * 
+     * @param array $keys original array keys
+     * @param array $keys original requested array
+     * 
+     * @return string $missing list of missing keys 
+    */
     public static function listFailedRequired(array $keys, array $fields): string 
     {
-        $missingKeys = array_diff($keys, array_keys($fields));
-        $missingKeysString = implode(', ', $missingKeys);
-        return $missingKeysString;
+        $keyDifference = array_diff($keys, array_keys($fields));
+        $missing = implode(', ', $keyDifference);
+        return $missing;
     }
 }
