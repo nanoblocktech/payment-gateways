@@ -36,6 +36,7 @@ class Event {
     private array $blacklist = [];
 
     /**
+     * PayStack event 
      * @var array $events allowed events  
     */
     private static $events = [
@@ -200,11 +201,11 @@ class Event {
         return false;
     }
 
-     /**
+    /**
      * Check if the request IP is allowed based on the whitelist and blacklist.
      * 
      * @return bool
-     */
+    */
     private function isWhiteListed(): bool
     {
         $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
