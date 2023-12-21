@@ -16,7 +16,7 @@
     ],
     
     "support": {
-        "issues": "https://github.com/laravel/payment-gateways/issues",
+        "issues": "https://github.com/nanoblocktech/payment-gateways/issues",
         "source": "https://github.com/nanoblocktech/payment-gateways"
     },
     
