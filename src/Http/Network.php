@@ -90,20 +90,25 @@ class Network {
       curl_setopt($curl, CURLOPT_HTTPHEADER, $sendHeaders);
 
       $response = curl_exec($curl);
-      $error =  (object)[];
+      $error =  (object)[
+         'code' => 0,
+         'message' => null
+      ];
       $headers = [];
       $body = [];
       $status = 0;
+      $headerSize = 0;
       
       if ($response === false) {
-         $error = (object)[
-            'message' => curl_error($curl),
-            'code' => curl_errno($curl),
-         ];
+         $error->message = curl_error($curl);
+         $error->code = curl_errno($curl);
       }else{
          $info = curl_getinfo($curl);
-         $status = $info['http_code'] ?? 0;
-         $headerSize = $info['header_size'] ?? 0;
+         if($info !== false){
+            $status = $info['http_code'] ?? 0;
+            $headerSize = $info['header_size'] ?? 0;
+         }
+         
          $returnHeaders = substr($response, 0, strpos($response, "\r\n\r\n"));
          $body = substr($response, $headerSize);
          $headers = $this->headersArray($returnHeaders, $status);
