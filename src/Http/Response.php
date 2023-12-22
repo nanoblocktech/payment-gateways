@@ -89,6 +89,16 @@ class Response {
     }
 
     /**
+     * Check if the request failed.
+     *
+     * @return bool 
+    */
+    public function isError(): bool 
+    {
+        return $this->result->statusCode !== 200 || $this->result->error->code !== 0;
+    }
+
+    /**
      * Get the parsed response body.
      *
      * @return object The parsed response body or null if not available.
@@ -125,6 +135,10 @@ class Response {
     */
     public function getErrors(): ?object
     {
+        if(!$this->body->status){
+            return $this->body ?? null;
+        }
+
         return $this->result->error ?? null;
     }
 
@@ -135,6 +149,10 @@ class Response {
     */
     public function getError(): string
     {
+        if(!$this->body->status){
+            return $this->body->message ?? '';
+        }
+
         return $this->result->error->message ?? '';
     }
 
@@ -157,6 +175,13 @@ class Response {
     */
     private function parseBody(mixed $body): object 
     {
+        if($body === []){
+            return (object) [
+                'status' => false,
+                'contentType' => $this->getHeader('Content-Type'),
+                'message' => 'Network request failed'
+            ];
+        }
         $contents = json_decode($body);
 
         if ($contents === null) {
