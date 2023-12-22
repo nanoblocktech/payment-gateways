@@ -15,7 +15,7 @@ Create dedicated virtual bank account with bank model instance
 Passing `BankModel` you don't need to specify other optional parameters, all your options can be set in BankModel methods see [Bank Model](docs/BANK_MODEL.md) for method reference.
 
 ```php
-use \Luminova\ExtraUtils\Payment\Models\Bank as BankModel;
+use \Luminova\ExtraUtils\Payment\Models\BankModel;
 $bankModel = new BankModel();
 $bankModel->setCustomerName($customer->first_name, $customer->last_name);
 $bankModel->setCustomerPhone($customer->phone);
