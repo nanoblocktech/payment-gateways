@@ -105,4 +105,23 @@ class Helper {
         $missing = implode(', ', $keyDifference);
         return $missing;
     }
+
+    /**
+     * Convert array keys to camel case
+     * 
+     * @param array $array 
+     * 
+     * @return array $casedProperties
+    */
+    public static function toArrayCamelCase(array $array): array 
+    {
+        $casedProperties = [];
+
+        foreach ($array as $key => $value) {
+            $caseKey = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
+            $casedProperties[$caseKey] = $value;
+        }
+
+        return $casedProperties;
+    }
 }
