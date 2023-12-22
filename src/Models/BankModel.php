@@ -10,7 +10,7 @@
 namespace Luminova\ExtraUtils\Payment\Models;
 
 use Luminova\ExtraUtils\Payment\Utils\Helper;
-class Bank
+class BankModel
 {
     /**
      * bank code 
