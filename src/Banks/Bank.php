@@ -7,257 +7,244 @@
  * @copyright (c) Nanoblock Technology Ltd
  * @license See LICENSE file
 */
-namespace Luminova\ExtraUtils\Payment\Banks;
+namespace Luminova\ExtraUtils\Payment\Models;
 
-use Luminova\ExtraUtils\Payment\Exceptions\PaymentException;
-use Luminova\ExtraUtils\Payment\Http\Network;
-use Luminova\ExtraUtils\Payment\Http\Response;
 use Luminova\ExtraUtils\Payment\Utils\Helper;
-
-class Bank {
+class Bank
+{
+    /**
+     * bank code 
+     * @var string $bankCode 
+    */
+    private string $bankCode = 'wema-bank';
 
     /**
-    *
-    * @var string base api url 
+     * customer code 
+     * @var string $customerCode 
     */
-    private string $apiBase = '';
+    private string $customerCode = '';
 
     /**
-    *
-    * @var Network network request instance 
+     * Customer sub account
+     * @var string $subAccount 
     */
-    private Network $network;
+    private $subAccount = '';
 
     /**
-    * Initializes process instance 
-    * @param string $key api key
-    * @param string $base api base url 
-    * @param string|null $name merchant name 
+     * Customer split code
+     * @var string $splitCode 
     */
-    public function __construct(string $key, string $base, ?string $name = null)
+    private $splitCode = '';
+
+    /**
+     * Customer first name
+     * @var string $customerFirstName 
+    */
+    private $customerFirstName = '';
+
+    /**
+     * Customer last name
+     * @var string $customerLastName 
+    */
+    private $customerLastName = '';
+
+    /**
+     * Customer phone number
+     * @var string $customerPhone 
+    */
+    private $customerPhone = '';
+
+    /**
+     * Set bank code
+     * @param string $bankCode 
+     * 
+     * @return self
+    */
+    final public function setBankCode(string $bankCode): self
     {
-        $this->apiBase = $base;
-        $this->network = new Network($key);
-        if($name !== null){
-            $this->network->setMerchantName($name);
-        }
-    }
-
-    /**
-    * Set payment merchant name
-    * @param string $name 
-    * 
-    * @return self $this
-    */
-    public function withProcessor(string $name): self 
-    {
-        $this->network->setMerchantName($name);
+        $this->bankCode = $bankCode;
+        
         return $this;
     }
 
     /**
-    * Create a dedicated virtual bank account
-    *
-    * @param string $identifier Customer id or code identifier 
-    * @param string $bank Preferred bank id  
-    * @param array $fields Optional fields
-    *
-    * @return Response 
-    * @throws PaymentException
+     * Set customer code
+     * 
+     * @param string $customerCode 
+     * 
+     * @return self
     */
-    public function createVirtualAccount(string $identifier, string $bank = 'wema-bank', array $fields = []): Response 
+    final public function setCustomerCode(string $customerCode): self
     {
-        $fields['customer'] = $identifier;
-        $fields['preferred_bank'] = $bank;
-        $url = "{$this->apiBase}/dedicated_account";
-        $result = $this->network->request($url, "POST", $fields, false);
-
-        return $result;
+        $this->customerCode = $customerCode;
+        
+        return $this;
     }
 
     /**
-    * Create a dedicated virtual bank account
-    *
-    * @param string $identifier Customer id or code identifier 
-    * @param string $bank Preferred bank id  
-    * @param array $fields Optional fields
-    *
-    * @return Response 
-    * @throws PaymentException
+     * Set customer sub account
+     * @param string $subAccount 
+     * 
+     * @return self
     */
-    public function assignVirtualAccount(array $fields): Response 
+    final public function setSubAccount(string $subAccount): self
     {
-        $requiredKeys = ['email', 'first_name', 'last_name', 'phone', 'preferred_bank', 'country'];
+        $this->subAccount = $subAccount;
 
-        if (Helper::isPassedRequired($requiredKeys, $fields)) {
-            $url = "{$this->apiBase}/dedicated_account";
-            $result = $this->network->request($url, "POST", $fields, false);
-
-            return $result;
-        }
-
-        $missingKeys = Helper::listFailedRequired($requiredKeys, $fields);
-        throw new PaymentException("Missing required keys: $missingKeys.");
+        return $this;
     }
 
     /**
-    * Create a dedicated virtual bank account
-    *
-    * @param bool $status List by account status
-    * @param string $currency List by currency code 
-    * @param array $fields Optional fields
-    *
-    * @return Response 
-    * @throws PaymentException
+     * Set customer bank split code
+     * @param string $splitCode 
+     * 
+     * @return self
     */
-    public function listVirtualAccount(bool $status = true, string $currency = 'NGN', array $fields = []): Response 
+    final public function setSplitCode(string $splitCode): self
     {
-        $fields['active'] = $fields['active'] ?? $status;
-        $fields['currency'] = $fields['currency'] ?? $currency;
-        $url = "{$this->apiBase}/dedicated_account";
-        $result = $this->network->request($url, "GET", $fields, true);
+        $this->splitCode = $splitCode;
 
-        return $result;
+        return $this;
     }
 
     /**
-    * Create a dedicated virtual bank account
-    *
-    * @param string $id Find account by dedicated account id
-    *
-    * @return Response 
-    * @throws PaymentException
+     * Set customer name
+     * 
+     * @param string $firstName 
+     * @param string $lastName
+     * 
+     * @return self
     */
-    public function findVirtualAccount(String $id): Response 
+    final public function setCustomerName(string $firstName, string $lastName): self
     {
-        $url = "{$this->apiBase}/dedicated_account/{$id}";
-        $result = $this->network->request($url, "GET", null, true);
+        $this->customerFirstName = $firstName;
+        $this->customerLastName = $lastName;
 
-        return $result;
-    }
-
-     /**
-    * Create a dedicated virtual bank account
-    *
-    * @param string $account Dedicated virtual bank account number
-    * @param string $slug Virtual bank account provider slug
-    * @param string $date Optional date format [yyyy-mm-dd]
-    *
-    * @return Response 
-    * @throws PaymentException
-    */
-    public function queryVirtualAccount(String $account, string $slug, string $date = ''): Response 
-    {
-        $url = "{$this->apiBase}/dedicated_account/requery?account_number={$account}&provider_slug={$slug}&date={$date}";
-        $result = $this->network->request($url, "GET", null, true);
-
-        return $result;
+        return $this;
     }
 
     /**
-    * List bank providers for dedicated virtual account
-    *
-    * @return Response 
-    * @throws PaymentException
+     * Set customer phone number
+     * 
+     * @param string $customerPhone 
+     * 
+     * @return self
     */
-    public function virtualAccountProviders(): Response 
+    final public function setCustomerPhone(string $customerPhone): self
     {
-        $url = "{$this->apiBase}/dedicated_account/available_providers";
-        $result = $this->network->request($url, "GET", null, true);
+        $this->customerPhone = $customerPhone;
 
-        return $result;
+        return $this;
+    }
+
+
+    /**
+     * Get bank code
+     * 
+     * @return string 
+    */
+    final public function getBankCode(): string
+    {
+        return $this->bankCode;
     }
 
     /**
-    * Resolve account number
-    *
-    * @param string|int $account account number 
-    * @param string|int $bic bank code 
-    *
-    * @return Response 
-    * @throws PaymentException
+     * Get customer code
+     * 
+     * @return string 
     */
-    public function resolveAccount(string|int $account, string|int $bic): Response 
+    final public function getCustomerCode(): string
     {
-        $url = "{$this->apiBase}/bank/resolve?account_number=".$account."&bank_code=".$bic;
-        $request = $this->network->request($url, "GET", null, true);
-
-        return $request;
+        return $this->customerCode;
     }
 
     /**
-    * Resolve BVN number
-    *
-    * @param string|int $bvn Bank Verification Number (BVN)
-    *
-    * @return Response 
-    * @throws PaymentException
+     * Get customer split code
+     * 
+     * @return string 
     */
-    public function resolveBvn(string|int $bvn): Response 
+    final public function getSplitCode(): string
     {
-        $url = "{$this->apiBase}/bank/resolve_bvn/".$bvn;
-        $request = $this->network->request($url, "GET", null, true);
-
-        return $request;
+        return $this->splitCode;
     }
 
     /**
-    * List banks in a specified country 
-    * 
-    * @param string $country 
-    * @param int $limit number of banks to return
-    * @param bool $cursor 
-    *
-    * @return Response 
-    * @throws PaymentException
-   */
-   public function list(string $country = 'nigeria', int $limit = 50, bool $cursor = false): Response 
-   {
-        $fields = [
-            'country' => $country,
-            'perPage' => $limit,
-            'use_cursor' => $cursor
+     * Get customer sub account
+     * 
+     * @return string 
+    */
+    final public function getSubAccount(): string
+    {
+        return $this->subAccount;
+    }
+
+    /**
+     * Get customer first name
+     * 
+     * @return string 
+    */
+    final public function getCustomerFirstName(): string
+    {
+        return $this->customerFirstName;
+    }
+
+    /**
+     * Get customer last name
+     * 
+     * @return string 
+    */
+    final public function getCustomerLastName(): string
+    {
+        return $this->customerLastName;
+    }
+
+    /**
+     * Get customer phone number
+     * 
+     * @return string 
+    */
+    final public function getCustomerPhone(): string
+    {
+        return $this->customerPhone;
+    }
+
+
+    /**
+     * Convert properties to array
+     * 
+     * @param bool $camelCase Optional boolean indicating whether to use camel case
+     * Default is false
+     * 
+     * @return string 
+    */
+    final public function toArray(bool $camelCase = false): array
+    {
+        $properties =  [
+            'preferred_bank' => $this->bankCode,
+            'customer' => $this->customerCode,
+            'sub_account' => $this->subAccount,
+            'split_code' => $this->splitCode,
+            'first_name' => $this->customerFirstName,
+            'last_name' => $this->customerLastName,
+            'phone' => $this->customerPhone,
         ];
-        $url = "{$this->apiBase}/bank";
-        $request = $this->network->request($url, "GET", $fields, true);
 
-        return $request;
-   }
-
-
-   /**
-    * Get bank by name or bank identification
-    *
-    * @param string $identification bank name or bank id 
-    *
-    * @return object 
-    * @throws PaymentException
-   */
-   public function get(string|int $identification): object
-   {
-        $result = $this->list();
-        if($result->isSuccess()){
-            foreach($result->getData() as $value){
-                if($value->code === $identification || strtolower($value->name) === strtolower($identification)){
-                    return (object) $value;
-                }
-            }
+        if($camelCase){
+            $properties = Helper::toArrayCamelCase($properties);
         }
-        throw new PaymentException('Failed to retrieve bank information.');
-   }
-   
-    /**
-    * Create a dedicated virtual bank account
-    *
-    * @param string $id Find account by dedicated account id
-    *
-    * @deprecated Abandoned since version X.Y.Z
-    * @return object 
-    */
-    public function deactivateVirtualAccount(String $id): object 
-    {
- 
-        return (object)[];
+
+        return $properties;
     }
-   
+
+    /**
+     * Convert properties to object
+     * 
+     * @return string 
+    */
+    final public function toObject(bool $camelCase = false): object
+    {
+        $obj = (object) $this->toArray($camelCase);
+
+        return $obj;
+    }
 }
