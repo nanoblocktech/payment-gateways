@@ -34,6 +34,11 @@ Check if the response is successful from gateway.
 $result->isSuccess(): bool
 ```
 
+Check if the network request failed or server doesn't respond with status code `200`
+```php
+$result->isError(): bool
+```
+
 Get a response object body returned from gateway
 ```php 
 $result->getBody(): object
