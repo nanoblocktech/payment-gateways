@@ -85,7 +85,7 @@ class Response {
     */
     public function isSuccess(): bool 
     {
-        return $this->body->status ?? false;
+        return (!$this->isError() && $this->body->status) ?? false;
     }
 
     /**
